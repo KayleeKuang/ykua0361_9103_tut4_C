@@ -3,6 +3,7 @@ let initialDotNumber = 60;
 let dotNumberDecrement = 5;
 let wheelPositions = [];
 let wheelIndex = 0;
+let isAllWheelsDisplayed = false;
 
 // Setup function to initialize canvas and position data
 function setup() {
@@ -34,10 +35,16 @@ function draw() {
   translate(width / 2, height / 2);
   rotate(PI / 12);
   translate(-width / 2 - 80, -height / 2 - 80);
+
+  // If all wheels are shown, start erasing
+  if (isAllWheelsDisplayed) {
+    eraseNextWheel();
+  }
 }
 
 // Draw each wheel at calculated positions
 // Set the Erase Timer
+// learn 'setTimeout()' from https://www.youtube.com/watch?v=nGfTjA8qNDA
 function drawNextWheel() {
   if (wheelIndex < wheelPositions.length) {
     let pos = wheelPositions[wheelIndex];
@@ -46,30 +53,34 @@ function drawNextWheel() {
     // Random delay between 100ms and 500ms
     let delay = random(100, 500); 
     // Set timer erase wheel
-    setTimeout(eraseWheelDisplay, delay, pos.x, pos.y, circleRadius); 
+    setTimeout(drawNextWheel, delay); 
+  } else {
+    isAllWheelsDisplayed = true;
+    // Start erasing when all wheels are displayed.
+    setTimeout(eraseNextWheel, 2000); 
   }
 }
 
-// Erase the wheel and prepare the next wheel for drawing
-function eraseWheelDisplay(x, y, radius) {
-  let eraseDelay = 500; 
-  setTimeout(() => {
-    eraseWheel(x, y, radius); 
-    if (wheelIndex < wheelPositions.length) {
-      drawNextWheel(); 
-    }
-  }, eraseDelay);
+// Erase next wheel
+function eraseNextWheel() {
+  if (wheelIndex > 0) {
+    wheelIndex--;
+    let pos = wheelPositions[wheelIndex]; 
+    eraseWheel(pos.x, pos.y, circleRadius); 
+    let delay = random(100, 500); 
+    setTimeout(eraseNextWheel, delay); 
+  } else {
+    isAllWheelsDisplayed = false; 
+  }
 }
 
 // Draw the background color to cover the wheel to achieve the erase effect
 function eraseWheel(x, y, radius) {
+  let eraseSize = radius * 2.2; 
   fill(195, 99, 40); 
   noStroke(); 
-  ellipse(x, y, radius * 2.2); 
-  let arcRadius = radius * 2.2; 
-  let startAngle = PI / 2; 
-  let endAngle = PI + 1; 
-  arc(x, y - radius, arcRadius, arcRadius, startAngle, endAngle);
+  rectMode(CENTER); 
+  rect(x, y, eraseSize, eraseSize); 
 }
 
 // Draw a single wheel with varying elements
@@ -166,6 +177,7 @@ function drawWheels(x, y, radius) {
   }
 }
 
+// Handle window size changes
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
