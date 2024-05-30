@@ -1,11 +1,31 @@
 let circleRadius = 75;
 let initialDotNumber = 60;
 let dotNumberDecrement = 5;
+let wheelPositions = [];
+let wheelIndex = 0;
 
+// Setup function to initialize canvas and position data
 function setup() {
   createCanvas(windowWidth, windowHeight);
   colorMode(HSB);
   noLoop();
+
+  // Calculate and store positions for drawing wheels
+  let spacing = 160;
+  let rows = height / spacing;
+  let cols = width / spacing;
+  for (let i = 0; i <= rows; i++) {
+    for (let j = 0; j <= cols; j++) {
+      let x = j * spacing + spacing / 2;
+      let y = i * spacing + spacing / 2;
+      wheelPositions.push({x, y});
+    }
+  }
+
+  // Shuffle the wheel positions for random appearance
+  // https://p5js.org/reference/#/p5/shuffl
+  wheelPositions = shuffle(wheelPositions);
+  drawNextWheel();
 }
 
 function draw() {
@@ -14,19 +34,20 @@ function draw() {
   translate(width / 2, height / 2);
   rotate(PI / 12);
   translate(-width / 2 - 80, -height / 2 - 80);
+}
 
-  let spacing = 160;
-  let rows = height / spacing;
-  let cols = width / spacing;
-  for (let i = 0; i <= rows; i++) {
-    for (let j = 0; j <= cols; j++) {
-      let x = j * spacing + spacing / 2;
-      let y = i * spacing + spacing / 2;
-      drawWheels(x, y, circleRadius);
-    }
+// Draw each wheel at calculated positions
+function drawNextWheel() {
+  if (wheelIndex < wheelPositions.length) {
+    let pos = wheelPositions[wheelIndex];
+    drawWheels(pos.x, pos.y, circleRadius);
+    wheelIndex++;
+    let delay = random(100, 500); // Random delay between 100ms and 500ms
+    setTimeout(drawNextWheel, delay);
   }
 }
 
+// Draw a single wheel with varying elements
 function drawWheels(x, y, radius) {
   // Draw line or dots
   let drawLines = random(1) > 0.5;
@@ -82,8 +103,8 @@ function drawWheels(x, y, radius) {
       }
     }
   } else {
+    // Draw dots on rings
     let dotColor = color(random(360), 50, 60);
-
     for (let i = 0; i < numDotRings; i++) {
       let dotRingRadius = radius * (1 - i * 0.1);
       let numDots = dotNumber[i];
@@ -98,7 +119,7 @@ function drawWheels(x, y, radius) {
     }
   }
 
-  // Center circle 
+  // Center inner circle 
   let numInnerCircles = 5;
   for (let i = 0; i < numInnerCircles; i++) {
     let innerRadius = radius * 0.5 * (1 - i * 0.2);
