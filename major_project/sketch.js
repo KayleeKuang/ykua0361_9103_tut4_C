@@ -57,7 +57,7 @@ function drawNextWheel() {
   } else {
     isAllWheelsDisplayed = true;
     // Start erasing when all wheels are displayed.
-    setTimeout(eraseNextWheel, 2000); 
+    setTimeout(eraseNextWheel, 1000); 
   }
 }
 
@@ -71,6 +71,8 @@ function eraseNextWheel() {
     setTimeout(eraseNextWheel, delay); 
   } else {
     isAllWheelsDisplayed = false; 
+    // After erasing, start drawing again
+    setTimeout(drawNextWheel, 1000); 
   }
 }
 
