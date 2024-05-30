@@ -37,14 +37,39 @@ function draw() {
 }
 
 // Draw each wheel at calculated positions
+// Set the Erase Timer
 function drawNextWheel() {
   if (wheelIndex < wheelPositions.length) {
     let pos = wheelPositions[wheelIndex];
     drawWheels(pos.x, pos.y, circleRadius);
     wheelIndex++;
-    let delay = random(100, 500); // Random delay between 100ms and 500ms
-    setTimeout(drawNextWheel, delay);
+    // Random delay between 100ms and 500ms
+    let delay = random(100, 500); 
+    // Set timer erase wheel
+    setTimeout(eraseWheelDisplay, delay, pos.x, pos.y, circleRadius); 
   }
+}
+
+// Erase the wheel and prepare the next wheel for drawing
+function eraseWheelDisplay(x, y, radius) {
+  let eraseDelay = 500; 
+  setTimeout(() => {
+    eraseWheel(x, y, radius); 
+    if (wheelIndex < wheelPositions.length) {
+      drawNextWheel(); 
+    }
+  }, eraseDelay);
+}
+
+// Draw the background color to cover the wheel to achieve the erase effect
+function eraseWheel(x, y, radius) {
+  fill(195, 99, 40); 
+  noStroke(); 
+  ellipse(x, y, radius * 2.2); 
+  let arcRadius = radius * 2.2; 
+  let startAngle = PI / 2; 
+  let endAngle = PI + 1; 
+  arc(x, y - radius, arcRadius, arcRadius, startAngle, endAngle);
 }
 
 // Draw a single wheel with varying elements
